@@ -12,13 +12,14 @@ let messages = [];
 app.post('/participants', (req, res) => {
     const username = req.body;
     const alreadyExists = participants.find(user => user.name === username.name);
-    if (username.name.length === 0) {
-        res.status(400)
+
+    if (!username) {
+        res.sendStatus(400)
     } else if (alreadyExists) {
-        res.status(401)
+        res.sendStatus(401)
     } else {
         const participant = {
-            name: username.name,
+            ...username,
             lastStatus: Date.now()
         }
 
@@ -32,12 +33,28 @@ app.post('/participants', (req, res) => {
 
         participants.push(participant);
         messages.push(loginMessage);
-        res.status(200)
+        res.sendStatus(200)
     }
 })
 
 app.get('/participants', (req, res) => {
     res.send(participants);
+})
+
+app.post('/messages', (req, res) => {
+    const username = req.headers.user;
+    const message = req.body;
+
+    if (!message.to || !message.text || (message.type !== 'message' && message.type !== 'private_message') || !participants.find(user => user.name === username)) {
+        res.sendStatus(400)
+    } else {
+        messages.push({
+            ...message,
+            from: username,
+            time: getLocalTime()
+        });
+        res.sendStatus(200);
+    }
 })
 
 app.listen(4000);
