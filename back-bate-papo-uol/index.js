@@ -29,11 +29,15 @@ app.post('/participants', (req, res) => {
             type: 'status', 
             time: getLocalTime()
         }
-        
+
         participants.push(participant);
         messages.push(loginMessage);
         res.status(200)
     }
+})
+
+app.get('/participants', (req, res) => {
+    res.send(participants);
 })
 
 app.listen(4000);
