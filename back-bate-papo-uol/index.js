@@ -13,7 +13,9 @@ app.post('/participants', (req, res) => {
     const username = req.body;
     const alreadyExists = participants.find(user => user.name === username.name);
 
-    if (!username || alreadyExists) {
+    if (!username.name) {
+        res.sendStatus(406)
+    } else if (alreadyExists) {
         res.sendStatus(400)
     } else {
         participants.push({
