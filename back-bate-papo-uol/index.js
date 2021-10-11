@@ -13,26 +13,22 @@ app.post('/participants', (req, res) => {
     const username = req.body;
     const alreadyExists = participants.find(user => user.name === username.name);
 
-    if (!username) {
+    if (!username || alreadyExists) {
         res.sendStatus(400)
-    } else if (alreadyExists) {
-        res.sendStatus(401)
     } else {
-        const participant = {
+        participants.push({
             ...username,
             lastStatus: Date.now()
-        }
+        });
 
-        const loginMessage = {
-            from: participant.name,
+        messages.push({
+            from: username.name,
             to: 'Todos',
             text: 'entra na sala...', 
             type: 'status', 
             time: getLocalTime()
-        }
+        });
 
-        participants.push(participant);
-        messages.push(loginMessage);
         res.sendStatus(200)
     }
 })
@@ -54,6 +50,21 @@ app.post('/messages', (req, res) => {
             time: getLocalTime()
         });
         res.sendStatus(200);
+    }
+})
+
+app.get('/messages', (req, res) => {
+    const limit = parseInt(req.query.limit);
+    const availableMessages = messages.filter(message => message.to === 'Todos' || message.from === req.headers.user );
+
+    if (availableMessages.length <= limit || limit === undefined) {
+        res.send(availableMessages);
+    } else {
+        const limitedMessages = [];
+        for (let i = 0; i < limit; i++) {
+            limitedMessages.push(availableMessages[i]);
+        }
+        res.send(limitedMessages);
     }
 })
 
