@@ -68,6 +68,21 @@ app.get('/messages', (req, res) => {
     }
 })
 
+app.post('/status', (req, res) => {
+    const username = req.headers.user;
+
+    if (participants.find(user => user.name === username)) {
+        participants.map(user => {
+            if (user.name === username) {
+                user.lastStatus = Date.now();
+            }
+        })
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(400);
+    }
+})
+
 app.listen(4000);
 
 function getLocalTime() {
