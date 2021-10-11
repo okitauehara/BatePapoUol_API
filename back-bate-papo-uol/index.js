@@ -85,6 +85,26 @@ app.post('/status', (req, res) => {
     }
 })
 
+setInterval(() => {
+    const timeNow = Date.now()
+    const onlineParticipants = participants.filter(user => {
+        if (timeNow - user.lastStatus > 10000) {
+            const logoutMessage = {
+                from: user.name,
+                to: 'Todos',
+                text: 'saiu da sala...', 
+                type: 'status', 
+                time: getLocalTime()
+            }
+            messages.push(logoutMessage)
+            return false
+        }
+        return true
+    })
+    
+    participants = [...onlineParticipants]
+}, 15000)
+
 app.listen(4000);
 
 function getLocalTime() {
